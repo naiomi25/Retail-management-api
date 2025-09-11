@@ -1,0 +1,19 @@
+# Backend (Python)
+backend/venv/
+*.pyc
+__pycache__/
+
+# Frontend (Node/React)
+frontend/node_modules/
+frontend/dist/
+
+# Configuración de editores
+.vscode/
+.idea/
+
+# Archivos del sistema
+.DS_Store
+
+
+# variable de entorno
+.env
