@@ -13,3 +13,7 @@ frontend/dist/
 
 # Archivos del sistema
 .DS_Store
+
+
+# variable de entorno
+.env
