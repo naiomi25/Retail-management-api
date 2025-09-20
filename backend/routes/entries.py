@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from sqlalchemy import select
@@ -126,13 +126,60 @@ def get_by_date():
         start = datetime.strptime(start_date, '%Y-%m-%d').date()
         end = datetime.strptime(end_date, '%Y-%m-%d').date()
         
-        entries = db.session.scalars(select(Entry) .where(Entry.user_id == user_id).where(Entry.date.between(start, end).order_by(Entry.date)).all())
+        if end < start:
+            return jsonify({'msg': 'La fecha de fin debe ser posterior a la de inicio'}), 400
         
+        entries = db.session.scalars(select(Entry).where(Entry.user_id == user_id, Entry.date.between(start, end)).order_by(Entry.date)).all()
+        
+    #    Separar las medias por turno
+    
+        entries_by_shift = {}
+        
+        for entry in entries:
+            shift = entry.shift
+            
+            if shift not in entries_by_shift:
+                entries_by_shift[shift] = []
+            entries_by_shift[shift].append(entry)
+        
+        
+    # calcular media por turno 
+    
+        average_by_shift = {}
+        
+        for shift,shift_entries in entries_by_shift.items():
+            
+            total_shifts = len(shift_entries)
+           
+            avg_net_sales = sum(e.net_sales for e in shift_entries) / total_shifts
+            avg_transactions = sum(e.transactions for e in shift_entries) / total_shifts
+            avg_articles = sum(e.articles for e in shift_entries) / total_shifts
+            avg_accessories = sum(e.accessories for e in shift_entries) / total_shifts
+            avg_apparel = sum(e.apparel for e in shift_entries) / total_shifts
+            avg_footfall = sum(e.footfall for e in shift_entries) / total_shifts
+            
+            avg_average = round(sum(float(e.average) for e in shift_entries) / total_shifts, 2)
+            avg_upt = round(sum(float(e.upt) for e in shift_entries) / total_shifts, 2)
+            avg_cr = round(sum(float(e.cr) for e in shift_entries) / total_shifts, 2)
+
+            average_by_shift[shift] = {
+               "avg_net_sales": avg_net_sales,
+                "avg_transactions": avg_transactions,
+                "avg_articles": avg_articles,
+                "avg_accessories": avg_accessories,
+                "avg_apparel": avg_apparel,
+                "avg_footfall": avg_footfall,
+                "avg_average": avg_average,   
+                "avg_upt": avg_upt,           
+                "avg_cr": avg_cr             
+            }
         return jsonify({
+            
             'start_date': start_date,
             'end_date': end_date,
             'total_entries': len(entries),
-            'entries': [entry.serialize() for entry in entries]
+            'entries': [entry.serialize() for entry in entries],
+            'averages_by_shift': average_by_shift
         })
         
          
