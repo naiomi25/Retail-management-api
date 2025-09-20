@@ -1,6 +1,8 @@
+import datetime
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from sqlalchemy import select
+
 
 from database import db
 from models.model_entries import Entry
@@ -83,7 +85,7 @@ def modify_entry(entry_id):
         return jsonify ({'error':'Error al obtener los datos'}),500
     
 @entries.route('/delete/<int:entry_id>',methods = ['DELETE'])
-@  jwt_required ()
+@ jwt_required ()
 def delete_entry(entry_id) :
     try:
 
@@ -105,3 +107,36 @@ def delete_entry(entry_id) :
     except Exception as e:
         print('error al obrener los datos',e)
         return jsonify ({'error':'Error al obtener los datos'}),500
+    
+    
+@entries.route('/range/',methods = ['GET'])
+@jwt_required()
+def get_by_date():
+    
+    try:
+    
+        user_id= int(get_jwt_identity())
+        
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        
+        if not start_date or not end_date :
+            return jsonify({'msg':'debes introducir las fechas de consulta'}),400
+        
+        start = datetime.strptime(start_date, '%Y-%m-%d').date()
+        end = datetime.strptime(end_date, '%Y-%m-%d').date()
+        
+        entries = db.session.scalars(select(Entry) .where(Entry.user_id == user_id).where(Entry.date.between(start, end).order_by(Entry.date)).all())
+        
+        return jsonify({
+            'start_date': start_date,
+            'end_date': end_date,
+            'total_entries': len(entries),
+            'entries': [entry.serialize() for entry in entries]
+        })
+        
+         
+    except Exception as e:
+        print('Error al obtener entradas por rango:', e)
+        return jsonify({'error': 'Error al obtener los datos'}), 500
+    
