@@ -19,7 +19,7 @@ def create_entry():
         user_id = get_jwt_identity()
         
         required_fields= ["date","shift", "net_sales","transactions","articles", "accessories","apparel", "footfall"] 
-        if not all (field in data and data[field] for field in  required_fields):
+        if not all(field in data and data[field] is not None and str(data[field]).strip() != '' for field in required_fields):
             return jsonify ({'error': 'no se han introducido todos los datos'}),400  
         
         new_entry = Entry(
