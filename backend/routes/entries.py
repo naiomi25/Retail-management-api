@@ -131,7 +131,7 @@ def get_by_date():
         
         entries = db.session.scalars(select(Entry).where(Entry.user_id == user_id, Entry.date.between(start, end)).order_by(Entry.date)).all()
         
-    #    Separar las medias por turno
+    # Separar las medias por turno
     
         entries_by_shift = {}
         
@@ -146,11 +146,11 @@ def get_by_date():
     # calcular media por turno 
     
         average_by_shift = {}
+        sums_by_shift = {}
         
         for shift,shift_entries in entries_by_shift.items():
-            
             total_shifts = len(shift_entries)
-           
+        #Promedios
             avg_net_sales = sum(e.net_sales for e in shift_entries) / total_shifts
             avg_transactions = sum(e.transactions for e in shift_entries) / total_shifts
             avg_articles = sum(e.articles for e in shift_entries) / total_shifts
@@ -162,8 +162,17 @@ def get_by_date():
             avg_upt = round(sum(float(e.upt) for e in shift_entries) / total_shifts, 2)
             avg_cr = round(sum(float(e.cr) for e in shift_entries) / total_shifts, 2)
 
+        # Sumatorios
+            sum_net_sales = sum(e.net_sales for e in shift_entries)
+            sum_transactions = sum(e.transactions for e in shift_entries) 
+            sum_articles = sum(e.articles for e in shift_entries) 
+            sum_accessories = sum(e.accessories for e in shift_entries) 
+            sum_apparel = sum(e.apparel for e in shift_entries) 
+            sum_footfall = sum(e.footfall for e in shift_entries) 
+
             average_by_shift[shift] = {
-               "avg_net_sales": avg_net_sales,
+                "days_count": total_shifts,
+                "avg_net_sales": avg_net_sales,
                 "avg_transactions": avg_transactions,
                 "avg_articles": avg_articles,
                 "avg_accessories": avg_accessories,
@@ -173,14 +182,28 @@ def get_by_date():
                 "avg_upt": avg_upt,           
                 "avg_cr": avg_cr             
             }
+            
+        # sumatorio de datos
+        
+            sums_by_shift[shift] = {
+                "sum_net_sales": float(sum_net_sales),
+                "sum_transactions": sum_transactions,
+                "sum_articles": sum_articles,
+                "sum_accessories": sum_accessories,
+                "sum_apparel": sum_apparel,
+                "sum_footfall": sum_footfall
+            }
+
+            
+    
         return jsonify({
             
             'start_date': start_date,
             'end_date': end_date,
             'total_entries': len(entries),
             'entries': [entry.serialize() for entry in entries],
-            'averages_by_shift': average_by_shift
-        })
+            'averages_by_shift': average_by_shift,
+            'sums_by_shift': sums_by_shift })
         
          
     except Exception as e:
