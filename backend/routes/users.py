@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from flask_jwt_extended import create_access_token
 from sqlalchemy import select
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -13,10 +13,12 @@ users = Blueprint("users", __name__, url_prefix="/api/users")
 def register():
     try:
         data = request.get_json()
+        if not data:
+            return jsonify({"error": "No se envió JSON"}), 400
         required_fields = ["name", "email", "password", "user_name"]
 
         if not all(field in data and data[field] for field in required_fields):
-            return jsonify({"error": "Faltan datos por rellenar"})
+            return jsonify({"error": "Faltan datos por rellenar"}),400
 
         user = db.session.scalar(select(User).where((User.email == data["email"])))
         if user:

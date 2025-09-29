@@ -19,8 +19,22 @@ def create_entry():
         user_id = get_jwt_identity()
         
         required_fields= ["date","shift", "net_sales","transactions","articles", "accessories","apparel", "footfall"] 
-        if not all(field in data and data[field] is not None and str(data[field]).strip() != '' for field in required_fields):
-            return jsonify ({'error': 'no se han introducido todos los datos'}),400  
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'error': f'Falta el campo {field}'}), 400
+
+            if field in ["net_sales", "transactions", "articles", "accessories", "apparel", "footfall"]:
+                if data[field] is None:
+                    return jsonify({'error': f'El campo {field} no puede ser nulo'}), 400
+            else:
+                if not str(data[field]).strip():
+                    return jsonify({'error': f'El campo {field} está vacío'}), 400
+
+        # Convertir la fecha de string a date para SQLite
+        try:
+            data["date"] = datetime.strptime(data["date"], "%Y-%m-%d").date()
+        except ValueError:
+            return jsonify({"error": "Formato de fecha inválido. Usa YYYY-MM-DD"}), 400
         
         new_entry = Entry(
             user_id = user_id,
@@ -41,9 +55,9 @@ def create_entry():
         'msg': 'entrada introducida correctamente',
         'entry': new_entry.serialize() }), 201 
                                                                          
-         
+   
     except Exception as e:
-        print('error de entrada',e)
+        print('Error en create_entry:',e)
         return jsonify( 'Error al cargar los datos'),500
     
     
@@ -151,12 +165,12 @@ def get_by_date():
         for shift,shift_entries in entries_by_shift.items():
             total_shifts = len(shift_entries)
         #Promedios
-            avg_net_sales = sum(e.net_sales for e in shift_entries) / total_shifts
-            avg_transactions = sum(e.transactions for e in shift_entries) / total_shifts
-            avg_articles = sum(e.articles for e in shift_entries) / total_shifts
-            avg_accessories = sum(e.accessories for e in shift_entries) / total_shifts
-            avg_apparel = sum(e.apparel for e in shift_entries) / total_shifts
-            avg_footfall = sum(e.footfall for e in shift_entries) / total_shifts
+            avg_net_sales =round( sum(e.net_sales for e in shift_entries) / total_shifts,2)
+            avg_transactions =round( sum(e.transactions for e in shift_entries) / total_shifts,2)
+            avg_articles = round (sum(e.articles for e in shift_entries) / total_shifts,2)
+            avg_accessories =round (sum(e.accessories for e in shift_entries) / total_shifts,2)
+            avg_apparel =round (sum(e.apparel for e in shift_entries) / total_shifts,2)
+            avg_footfall =round (sum(e.footfall for e in shift_entries) / total_shifts,2)
             
             avg_average = round(sum(float(e.average) for e in shift_entries) / total_shifts, 2)
             avg_upt = round(sum(float(e.upt) for e in shift_entries) / total_shifts, 2)
