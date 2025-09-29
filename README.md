@@ -28,6 +28,7 @@ This repository contains the **backend** of a Web Data Management project. It pr
 | **Flask-Migrate** | Database migrations |
 | **PostgreSQL** | Relational database |
 | **Flask-CORS** | Cross-origin request handling |
+| **Pytest** |Test |
 
 ## 🚀 Installation
 
@@ -85,6 +86,28 @@ This repository contains the **backend** of a Web Data Management project. It pr
    ```bash
    flask --app app.py run
    ```
+8. **Run the server**
+  
+This project uses `pytest` to automatically verify the functionality of the API.  
+Tests cover:
+
+- User registration and login
+- Creating, modifying, and deleting sales entries
+- Querying entries by date range
+- Data validation and error handling
+
+**Run all tests**:
+
+```bash
+# Make sure your virtual environment is active
+pytest
+```
+Notes:
+
+Tests run against an in-memory SQLite database (sqlite:///:memory:), so they do not affect your PostgreSQL production database.
+
+An authenticated_client fixture is used to simulate a logged-in user for testing protected endpoints.
+
 
 🎉 **Server running at:** `http://127.0.0.1:5000`
 
