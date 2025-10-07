@@ -11,7 +11,10 @@ def create_app(config_name="development"):
     app.config.from_object(config_by_name[config_name])
 
     # Extensiones
-    CORS(app, origins="http://localhost:5173")
+    CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}},
+         supports_credentials=True, 
+         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
+         allow_headers=["Content-Type", "Authorization"])
     db.init_app(app)
     JWTManager(app)
     Migrate(app, db)
