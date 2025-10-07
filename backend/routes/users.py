@@ -9,8 +9,10 @@ from models.model_users import User
 users = Blueprint("users", __name__, url_prefix="/api/users")
 
 
-@users.route("/register", methods=["POST"])
+@users.route("/register", methods=["POST","OPTIONS"])
 def register():
+    if request.method == "OPTIONS":
+        return jsonify({}), 200 
     try:
         data = request.get_json()
         if not data:
