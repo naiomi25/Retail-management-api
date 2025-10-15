@@ -1,19 +1,38 @@
-# Backend (Python)
+# Virtual environments (common names)
+.venv/
+venv/
+env/
 backend/venv/
-*.pyc
+
+# Byte-compiled / optimized / DLL files
+*.py[cod]
+*$py.class
 __pycache__/
 
-# Frontend (Node/React)
-frontend/node_modules/
-frontend/dist/
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+pip-wheel-metadata/
 
-# Configuración de editores
+# Test and coverage
+.pytest_cache/
+.cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Configuration files
+.env
+
+# Editors and OS
 .vscode/
 .idea/
-
-# Archivos del sistema
 .DS_Store
+Thumbs.db
 
+# Database / local files
+*.sqlite3
 
-# variable de entorno
-.env
+# Logs
+*.log

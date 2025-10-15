@@ -36,6 +36,7 @@ class Entry(db.Model):
             self.upt = round((self.articles / self.transactions) * 100, 2)
         else:
             self.upt = 0
+            #  no son porcentajes, tengo que quitar la multiplicacion por 100
 
         if self.footfall > 0:
             self.cr = round((self.transactions / self.footfall) * 100, 2)
