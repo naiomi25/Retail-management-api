@@ -33,10 +33,10 @@ class Entry(db.Model):
             self.average = 0
 
         if self.articles > 0:
-            self.upt = round((self.articles / self.transactions) * 100, 2)
+            self.upt = round(self.articles / self.transactions ,2)
         else:
             self.upt = 0
-            #  no son porcentajes, tengo que quitar la multiplicacion por 100
+           
 
         if self.footfall > 0:
             self.cr = round((self.transactions / self.footfall) * 100, 2)
