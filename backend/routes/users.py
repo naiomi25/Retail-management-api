@@ -68,7 +68,7 @@ def login():
         print(access_token)
 
         return jsonify(
-            {"msn": "usuario logeado correctamente", "access_token": access_token}
+            {"msn": "usuario logeado correctamente", "access_token": access_token,'user': user.serialize() }
         )
 
     except Exception as e:

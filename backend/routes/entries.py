@@ -150,7 +150,7 @@ def get_by_date():
         entries_by_shift = {}
         
         for entry in entries:
-            shift = entry.shift
+            shift = entry.shift.lower().strip()
             
             if shift not in entries_by_shift:
                 entries_by_shift[shift] = []
